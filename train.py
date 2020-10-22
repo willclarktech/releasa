@@ -70,7 +70,7 @@ def target_transform(folder_names: List[str]):
 
 def main() -> None:
     transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
-    datadir = "./data/grayscale-digits"
+    datadir = "./data/grayscale-digits-train"
     folder_names = sorted(os.listdir(datadir))
     dataset = datasets.ImageFolder(
         datadir, transform=transform, target_transform=target_transform(folder_names)
@@ -85,7 +85,7 @@ def main() -> None:
     for i in range(n_epochs):
         train(model, train_loader, optimizer, i)
 
-    torch.save(model.state_dict(), "./models/model.pkl")
+    torch.save(model.state_dict(), "./models/grayscale-digits.pkl")
 
 
 if __name__ == "__main__":
