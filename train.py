@@ -15,7 +15,7 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(16, 8, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(28_712, 128)
+        self.fc1 = nn.Linear(1232, 128)
         self.fc2 = nn.Linear(128, 60)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -69,7 +69,9 @@ def target_transform(folder_names: List[str]):
 
 
 def main() -> None:
-    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
+    transform = transforms.Compose(
+        [transforms.Grayscale(), transforms.Resize((50, 20)), transforms.ToTensor(),]
+    )
     datadir = "./data/grayscale-digits-train"
     folder_names = sorted(os.listdir(datadir))
     dataset = datasets.ImageFolder(
@@ -78,10 +80,10 @@ def main() -> None:
     train_loader = DataLoader(dataset, shuffle=True, batch_size=32)
 
     model = Net()
-    learning_rate = 0.001
+    learning_rate = 0.0003
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    n_epochs = 10
+    n_epochs = 20
     for i in range(n_epochs):
         train(model, train_loader, optimizer, i)
 

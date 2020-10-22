@@ -8,7 +8,9 @@ from train import Net, target_transform
 
 
 def main() -> None:
-    transform = transforms.Compose([transforms.Grayscale(), transforms.ToTensor()])
+    transform = transforms.Compose(
+        [transforms.Grayscale(), transforms.Resize((50, 20)), transforms.ToTensor(),]
+    )
     datadir = "./data/grayscale-digits-test"
     folder_names = sorted(os.listdir(datadir))
     dataset = datasets.ImageFolder(
