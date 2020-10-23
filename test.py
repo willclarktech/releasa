@@ -11,7 +11,7 @@ def main() -> None:
     transform = transforms.Compose(
         [transforms.Grayscale(), transforms.Resize((50, 20)), transforms.ToTensor(),]
     )
-    datadir = "./data/grayscale-digits-test"
+    datadir = "./data/rgb-digits-test"
     folder_names = sorted(os.listdir(datadir))
     dataset = datasets.ImageFolder(
         datadir, transform=transform, target_transform=target_transform(folder_names)
@@ -20,7 +20,7 @@ def main() -> None:
     test_loader = DataLoader(dataset, batch_size=batch_size)
 
     model = Net()
-    state_dict = torch.load("./models/grayscale-digits.zip")
+    state_dict = torch.load("./models/rgb-digits.pkl")
     model.load_state_dict(state_dict)
     model.eval()
 

@@ -2,5 +2,4 @@ __pycache__/
 .mypy_cache/
 .vscode/
 data/
-lib/
 models/
