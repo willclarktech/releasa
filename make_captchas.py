@@ -17,7 +17,9 @@ def random_color() -> (int, int, int):
 def make_captcha(
     dirname: str, n_digits: int, font_file: str, random_noise: float
 ) -> None:
-    font = ImageFont.truetype(font_file, 44)
+
+    font = ImageFont.truetype(font_file, font_size)
+
     i = randint(0, 10 ** n_digits)
     target = f"{i:06}"
 
@@ -56,13 +58,15 @@ def add_noise(draw, random_noise: float) -> None:
 def main(
     train_dirname: str,
     test_dirname: str,
-    n_train_images: int,
+    m_train_images: int,
     n_test_images: int,
     n_digits: int,
     font_files: list,
     random_noise: int,
 ) -> None:
-    for _ in range(n_train_images):
+
+    for _ in range(m_train_images):
+
         make_captcha(train_dirname, n_digits, choice(font_files), random_noise)
     for _ in range(n_test_images):
         make_captcha(test_dirname, n_digits, choice(font_files), random_noise)
@@ -74,13 +78,16 @@ if __name__ == "__main__":
     height = 80
     train_dirname = "./data/rgb-digits-train/"
     test_dirname = "./data/rgb-digits-test/"
-    n_train_images = 10_000
+    m_train_images = 10_000
+
     n_test_images = 1000
     n_digits = 6
     path_to_deafult_font = "./lib/fonts/Comic Sans MS.ttf"
     font_files = [path_to_deafult_font]
     path_glob_to_fonts = "./lib/fonts/*.ttf"
     random_noise = 0.0
+    font_size = 44
+
 
     parser = argparse.ArgumentParser(
         description="make captcha training data for releasa"
@@ -100,9 +107,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-m",
-        "--n_train_images",
+        "--m_train_images",
         type=int,
-        default=n_train_images,
+        default=m_train_images,
+
         help="number of train captchas to create",
     )
     parser.add_argument(
@@ -127,9 +135,11 @@ if __name__ == "__main__":
     main(
         train_dirname,
         test_dirname,
-        args.n_train_images,
+        args.m_train_images,
+
         args.n_test_images,
         n_digits,
         font_files,
         args.random_noise,
     )
+
