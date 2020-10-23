@@ -20,7 +20,7 @@ def main() -> None:
     test_loader = DataLoader(dataset, batch_size=batch_size)
 
     model = Net()
-    state_dict = torch.load("./models/grayscale-digits.pkl")
+    state_dict = torch.load("./models/grayscale-digits.zip")
     model.load_state_dict(state_dict)
     model.eval()
 

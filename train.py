@@ -87,7 +87,7 @@ def main() -> None:
     for i in range(n_epochs):
         train(model, train_loader, optimizer, i)
 
-    torch.save(model.state_dict(), "./models/grayscale-digits.pkl")
+    torch.save(model.state_dict(), "./models/grayscale-digits.zip")
 
 
 if __name__ == "__main__":
