@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-
 import os
 import sys
-import numpy as np
+import numpy as np  # type: ignore
 import glob
 import argparse
 from random import randint, choice
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageOps  # type: ignore
+from typing import Tuple
 
 
-# def random_color() -> Tuple:
-def random_color() -> (int, int, int):
+def random_color() -> Tuple[int, int, int]:
     return (randint(0, 245), randint(0, 245), randint(0, 245))
 
 
@@ -25,9 +24,8 @@ def make_captcha(
 
     subdirname = dirname + target
     if os.path.exists(subdirname):
-        return make_captcha(dirname, n_digits, font, random_noise)
+        return make_captcha(dirname, n_digits, font_file, random_noise)
 
-    # img = Image.new("RGB", (width, height), (0, 0, 0))
     img = Image.new("RGB", (width, height), "black")
 
     drawing = ImageDraw.Draw(img)
@@ -45,7 +43,7 @@ def make_captcha(
         img.save(subdirname + "/0.png")
 
 
-def add_noise(draw, random_noise: float) -> None:
+def add_noise(draw: ImageDraw.Draw, random_noise: float) -> None:
     # TODO: dont hard code ...
     cmin = int(randint(50, 70) * random_noise)
     cmax = int(randint(90, 120) * random_noise)
@@ -66,7 +64,6 @@ def main(
 ) -> None:
 
     for _ in range(m_train_images):
-
         make_captcha(train_dirname, n_digits, choice(font_files), random_noise)
     for _ in range(n_test_images):
         make_captcha(test_dirname, n_digits, choice(font_files), random_noise)
@@ -82,12 +79,11 @@ if __name__ == "__main__":
 
     n_test_images = 1000
     n_digits = 6
-    path_to_deafult_font = "./lib/fonts/Comic Sans MS.ttf"
-    font_files = [path_to_deafult_font]
+    path_to_default_font = "./lib/fonts/Comic Sans MS.ttf"
+    font_files = [path_to_default_font]
     path_glob_to_fonts = "./lib/fonts/*.ttf"
     random_noise = 0.0
     font_size = 44
-
 
     parser = argparse.ArgumentParser(
         description="make captcha training data for releasa"
@@ -110,7 +106,6 @@ if __name__ == "__main__":
         "--m_train_images",
         type=int,
         default=m_train_images,
-
         help="number of train captchas to create",
     )
     parser.add_argument(
@@ -136,10 +131,8 @@ if __name__ == "__main__":
         train_dirname,
         test_dirname,
         args.m_train_images,
-
         args.n_test_images,
         n_digits,
         font_files,
         args.random_noise,
     )
-
