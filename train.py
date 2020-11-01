@@ -12,6 +12,8 @@ from typing import List, Optional
 class Net(nn.Module):
     def __init__(self) -> None:
         super(Net, self).__init__()
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         self.conv1 = nn.Conv2d(1, 16, 5, 1)
         self.conv2 = nn.Conv2d(16, 8, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
@@ -19,7 +21,10 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(28712, 128)
         self.fc2 = nn.Linear(128, 60)
 
+        self.to(self.device)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = x.to(self.device)
         x = self.conv1(x)
         x = F.relu(x)
         x = self.conv2(x)
@@ -47,7 +52,9 @@ def train(
         optimizer.zero_grad()
         output = model(data)
 
-        loss = F.nll_loss(output.permute(0, 2, 1), target, reduction="sum")
+        loss = F.nll_loss(
+            output.permute(0, 2, 1), target.to(model.device), reduction="sum"
+        )
         loss.backward()
         optimizer.step()
 
@@ -56,7 +63,7 @@ def train(
                 f"Train Epoch: {epoch} [{i*len(data)}/{len(train_loader.dataset)} ({100.0 * i / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}".format()
             )
             target_text = stringify_digits(target[0])
-            prediction_text = stringify_digits(output[0].argmax(1))
+            prediction_text = stringify_digits(output[0].cpu().argmax(1))
             print(f"Target: {target_text}; Prediction: {prediction_text}")
 
 
@@ -101,7 +108,7 @@ def main(save_path: str, load_path: Optional[str] = None) -> None:
     model = Net()
     if load_path:
         model.load_state_dict(torch.load(save_path))
-    learning_rate = 0.0003
+    learning_rate = 0.0001
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     n_epochs = 10
@@ -113,6 +120,6 @@ def main(save_path: str, load_path: Optional[str] = None) -> None:
 
 if __name__ == "__main__":
     save_path = "./models/rgb-digits.zip"
-    # load_path = save_path
-    # main(save_path, load_path)
-    main(save_path)
+    load_path = save_path
+    main(save_path, load_path)
+    # main(save_path)
