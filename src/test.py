@@ -9,20 +9,19 @@ from network import Net
 from utils import detect_edges, target_transform
 
 
-def main() -> None:
+def main(datadir: str, load_path: str) -> None:
     transform = transforms.Compose(
         [detect_edges, transforms.Grayscale(), transforms.ToTensor(),]
     )
-    datadir = "./data/rgb-digits-test"
     folder_names = sorted(os.listdir(datadir))
     dataset = datasets.ImageFolder(
         datadir, transform=transform, target_transform=target_transform(folder_names)
     )
-    batch_size = 1000
+    batch_size = len(folder_names)
     test_loader = DataLoader(dataset, batch_size=batch_size)
 
     model = Net()
-    state_dict = torch.load("./models/rgb-digits.zip")
+    state_dict = torch.load(load_path)
     model.load_state_dict(state_dict)
     model.eval()
 
@@ -40,4 +39,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    datadir = "./data/rgb-digits-test"
+    load_path = "./models/rgb-digits.zip"
+    main(datadir, load_path)
