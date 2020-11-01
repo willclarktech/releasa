@@ -5,17 +5,13 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms  # type: ignore
 from typing import List
 
-from train import Net, detect_edges, target_transform
+from network import Net
+from utils import detect_edges, target_transform
 
 
 def main() -> None:
     transform = transforms.Compose(
-        [
-            detect_edges,
-            transforms.Grayscale(),
-            # transforms.Resize((50, 20)),
-            transforms.ToTensor(),
-        ]
+        [detect_edges, transforms.Grayscale(), transforms.ToTensor(),]
     )
     datadir = "./data/rgb-digits-test"
     folder_names = sorted(os.listdir(datadir))
