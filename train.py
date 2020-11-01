@@ -108,7 +108,7 @@ def main(save_path: str, load_path: Optional[str] = None) -> None:
     model = Net()
     if load_path:
         model.load_state_dict(torch.load(save_path))
-    learning_rate = 0.0001
+    learning_rate = 0.00001
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     n_epochs = 10
