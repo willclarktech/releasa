@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 import os
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter  # type: ignore
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
