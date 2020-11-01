@@ -1,11 +1,12 @@
 import os
+from PIL import Image, ImageFilter
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms  # type: ignore
-from typing import List
+from typing import List, Optional
 
 
 class Net(nn.Module):
@@ -15,7 +16,7 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(16, 8, 3, 1)
         self.dropout1 = nn.Dropout(0.25)
         self.dropout2 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(1232, 128)
+        self.fc1 = nn.Linear(28712, 128)
         self.fc2 = nn.Linear(128, 60)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -54,11 +55,13 @@ def train(
             print(
                 f"Train Epoch: {epoch} [{i*len(data)}/{len(train_loader.dataset)} ({100.0 * i / len(train_loader):.0f}%)]\tLoss: {loss.item():.6f}".format()
             )
-
-        if i % 100 == 0:
             target_text = stringify_digits(target[0])
             prediction_text = stringify_digits(output[0].argmax(1))
             print(f"Target: {target_text}; Prediction: {prediction_text}")
+
+
+def detect_edges(img: Image.Image) -> Image.Image:
+    return img.filter(ImageFilter.FIND_EDGES)
 
 
 def target_transform(folder_names: List[str]):
@@ -68,9 +71,25 @@ def target_transform(folder_names: List[str]):
     return t
 
 
-def main() -> None:
+counter = 0
+
+
+def show(img: Image.Image) -> Image.Image:
+    counter += 1
+    if counter < 5:
+        img.show()
+    return img
+
+
+def main(save_path: str, load_path: Optional[str] = None) -> None:
     transform = transforms.Compose(
-        [transforms.Grayscale(), transforms.Resize((50, 20)), transforms.ToTensor(),]
+        [
+            detect_edges,
+            transforms.Grayscale(),
+            # transforms.Resize((50, 20)),
+            # show,
+            transforms.ToTensor(),
+        ]
     )
     datadir = "./data/rgb-digits-train"
     folder_names = sorted(os.listdir(datadir))
@@ -80,15 +99,20 @@ def main() -> None:
     train_loader = DataLoader(dataset, shuffle=True, batch_size=32)
 
     model = Net()
+    if load_path:
+        model.load_state_dict(torch.load(save_path))
     learning_rate = 0.0003
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-    n_epochs = 20
+    n_epochs = 10
     for i in range(n_epochs):
         train(model, train_loader, optimizer, i)
 
-    torch.save(model.state_dict(), "./models/rgb-digits.zip")
+    torch.save(model.state_dict(), save_path)
 
 
 if __name__ == "__main__":
-    main()
+    save_path = "./models/rgb-digits.zip"
+    # load_path = save_path
+    # main(save_path, load_path)
+    main(save_path)
