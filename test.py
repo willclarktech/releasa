@@ -10,9 +10,9 @@ from train import Net, detect_edges, target_transform
 def main() -> None:
     transform = transforms.Compose(
         [
-            detect_edges(),
+            detect_edges,
             transforms.Grayscale(),
-            transforms.Resize((50, 20)),
+            # transforms.Resize((50, 20)),
             transforms.ToTensor(),
         ]
     )
@@ -33,7 +33,7 @@ def main() -> None:
     with torch.no_grad():
         for data, target in test_loader:
             output = model(data)
-            predictions = output.argmax(2, keepdim=True)
+            predictions = output.cpu().argmax(2, keepdim=True)
             correct = predictions.eq(target.view_as(predictions)).sum(1).flatten()
             score += correct.eq(6).sum().item()
 
